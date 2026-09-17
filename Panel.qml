@@ -499,27 +499,73 @@ Item {
 
                     Repeater {
                       model: root.selectedClient ? Model.rawFieldEntries(root.selectedClient.raw) : []
-                      delegate: Row {
+                      delegate: Item {
+                        id: fieldRow
                         required property var modelData
+                        property bool justCopied: false
                         width: fieldsColumn.width
-                        spacing: Style.space(8)
+                        implicitHeight: Math.max(keyText.implicitHeight, valueText.implicitHeight)
+                        height: implicitHeight
+
+                        HoverHandler { id: rowHover }
+
+                        Timer {
+                          id: copiedResetTimer
+                          interval: 1500
+                          repeat: false
+                          onTriggered: fieldRow.justCopied = false
+                        }
 
                         Text {
+                          id: keyText
+                          anchors.left: parent.left
+                          anchors.top: parent.top
                           width: Style.space(120)
-                          text: modelData.key
+                          text: fieldRow.modelData.key
                           textFormat: Text.PlainText
                           color: root.onScrimDim
                           font.family: Style.font.family
                           font.pixelSize: Style.font.caption
                         }
                         Text {
-                          width: fieldsColumn.width - Style.space(128)
-                          text: modelData.value
+                          id: valueText
+                          anchors.left: keyText.right
+                          anchors.leftMargin: Style.space(8)
+                          anchors.right: copyIcon.left
+                          anchors.rightMargin: Style.space(8)
+                          anchors.top: parent.top
+                          text: fieldRow.modelData.value
                           textFormat: Text.PlainText
                           color: root.onScrim
                           font.family: Style.font.family
                           font.pixelSize: Style.font.caption
                           wrapMode: Text.WordWrap
+                        }
+                        Text {
+                          id: copyIcon
+                          anchors.right: parent.right
+                          anchors.rightMargin: Style.space(22)
+                          anchors.verticalCenter: keyText.verticalCenter
+                          visible: rowHover.hovered || copyArea.containsMouse || fieldRow.justCopied
+                          text: fieldRow.justCopied ? "󰄬" : "󰆏"
+                          textFormat: Text.PlainText
+                          color: fieldRow.justCopied ? root.onScrimGood
+                            : (copyArea.containsMouse ? root.onScrim : root.onScrimDim)
+                          font.family: Style.font.family
+                          font.pixelSize: Style.font.title
+
+                          MouseArea {
+                            id: copyArea
+                            anchors.fill: parent
+                            anchors.margins: -6
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                              Quickshell.execDetached(["wl-copy", "--", fieldRow.modelData.value])
+                              fieldRow.justCopied = true
+                              copiedResetTimer.restart()
+                            }
+                          }
                         }
                       }
                     }
