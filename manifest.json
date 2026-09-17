@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "marcuspelo.omarclients",
+  "name": "Omarclients",
+  "version": "0.1.0",
+  "author": "marcuspelo",
+  "license": "MIT",
+  "description": "Search and inspect Hyprland client (window) data: filter by visibility and monitor, view every hyprctl field, focus or close the selected window.",
+  "kinds": ["bar-widget", "panel"],
+  "keepLoaded": false,
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Clients",
+    "description": "Inspect and manage Hyprland windows (clients)",
+    "category": "System",
+    "aliases": ["clients", "windows", "janelas", "hyprctl"],
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
